@@ -6,11 +6,19 @@ use std::{
 #[cfg(test)]
 mod tests;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub struct EqGraph<V: Sized + Clone + Ord + Eq + Hash> {
     // invariant: self.decreasing(). It follows this is normalzing.
     // Intuitively, because self.parent_of is functional there can be no forks.
     parent_of: HashMap<V, V>,
+}
+
+impl<V: Sized + Clone + Ord + Eq + Hash> Default for EqGraph<V> {
+    fn default() -> Self {
+        Self {
+            parent_of: Default::default(),
+        }
+    }
 }
 
 impl<V: Sized + Clone + Ord + Eq + Hash> EqGraph<V> {
