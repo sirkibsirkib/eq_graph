@@ -17,22 +17,23 @@ impl<V: Sized + Clone + Ord + Eq + Hash> EqGraph<V> {
     pub fn decreasing(&self) -> bool {
         self.parent_of.iter().all(|(k, v)| k > v)
     }
-    pub fn relate(&mut self, a: V, b: V) {
+    pub fn relate(&mut self, a: V, b: V) -> bool {
         if a == b {
             // optimization: early exit
-            return;
+            return false;
         }
         let ra = self.root_of(&a);
         let rb = self.root_of(&b);
         let [rless, rmore] = if ra == rb {
             // nothing to do here
-            return;
+            return false;
         } else if ra < rb {
             [ra, rb]
         } else {
             [rb, ra]
         };
         self.parent_of.insert(rmore.clone(), rless.clone());
+        true
     }
     pub fn root_of<'a: 'b, 'b>(&'a self, mut v: &'b V) -> &'b V {
         while let Some(parent) = self.parent_of.get(v) {
