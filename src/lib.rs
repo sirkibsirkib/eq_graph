@@ -6,21 +6,14 @@ use std::{
 #[cfg(test)]
 mod tests;
 
-pub trait Vertex: Sized + Clone + Ord + Eq + Hash {}
-impl Vertex for u32 {}
-impl Vertex for u64 {}
-impl Vertex for u16 {}
-impl Vertex for u8 {}
-impl Vertex for usize {}
-
 #[derive(Default, Debug)]
-pub struct EqGraph<V: Vertex> {
+pub struct EqGraph<V: Sized + Clone + Ord + Eq + Hash> {
     // invariant: self.decreasing(). It follows this is normalzing.
     // Intuitively, because self.parent_of is functional there can be no forks.
     parent_of: HashMap<V, V>,
 }
 
-impl<V: Vertex> EqGraph<V> {
+impl<V: Sized + Clone + Ord + Eq + Hash> EqGraph<V> {
     pub fn decreasing(&self) -> bool {
         self.parent_of.iter().all(|(k, v)| k > v)
     }
@@ -62,6 +55,11 @@ impl<V: Vertex> EqGraph<V> {
     }
     pub fn iter_roots(&self) -> impl Iterator<Item = (&V, &V)> {
         self.parent_of.keys().map(|x| (x, self.root_of(x)))
+    }
+    pub fn descendants<'a>(&'a self, v1: &'a V) -> impl Iterator<Item = &'a V> {
+        self.parent_of
+            .values()
+            .filter(move |v2| self.root_of(v2) == v1)
     }
     pub fn parents_to_children(&self) -> HashMap<V, HashSet<V>> {
         let mut ret: HashMap<V, HashSet<V>> = Default::default();
