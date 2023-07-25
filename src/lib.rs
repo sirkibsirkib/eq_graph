@@ -56,10 +56,11 @@ impl<V: Sized + Clone + Ord + Eq + Hash> EqGraph<V> {
     pub fn iter_roots(&self) -> impl Iterator<Item = (&V, &V)> {
         self.parent_of.keys().map(|x| (x, self.root_of(x)))
     }
-    pub fn descendants<'a>(&'a self, v1: &'a V) -> impl Iterator<Item = &'a V> {
+    pub fn equivalents<'a>(&'a self, v: &'a V) -> impl Iterator<Item = &'a V> {
+        let root = self.root_of(v);
         self.parent_of
             .values()
-            .filter(move |v2| self.root_of(v2) == v1)
+            .filter(move |v| self.root_of(v) == root)
     }
     pub fn parents_to_children(&self) -> HashMap<V, HashSet<V>> {
         let mut ret: HashMap<V, HashSet<V>> = Default::default();
